@@ -1,15 +1,31 @@
 import { Hono } from 'hono'
 import { cors } from "hono/cors"
 import theme from './theme'
+import { getNum, setNum } from "./sqlite";
+
+type Bindings = {
+    DB: D1Database;
+}
 
 
-
-
-const app = new Hono<{}>()
+const app = new Hono<{ Bindings: Bindings }>()
 
 // app.use('/*', cors())
 app.get('/', (c) => c.text('Hello Hono!'))
 app.get('/asoul', (c) => c.body(theme.asoul.images[0]))
+app.get('/api/:name', async (c) => {
+    const name = c.req.param("name")
+    const add = c.req.query('add')
+    console.log(name)
+    const counter = await getNum(c.env.DB, name);
+
+    if (add !== '0') {
+        c.executionCtx.waitUntil(setNum(c.env.DB, name, counter.num + 1))
+    }
+
+    // await setNum(c.env.DB, name, 10)
+    return c.text(`name: ${name}, num: ${counter.num}`)
+})
 // app.get("/:id", async (c) => {
 //     const id = c.req.param("id");
 //     const add = parseInt(c.req.query('add') || '1')

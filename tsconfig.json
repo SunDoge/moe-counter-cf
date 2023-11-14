@@ -10,7 +10,6 @@
     ],
     "types": [
       "@cloudflare/workers-types",
-      "src/types/image"
     ],
     "jsx": "react-jsx",
     "jsxImportSource": "hono/jsx"
