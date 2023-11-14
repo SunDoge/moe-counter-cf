@@ -1,0 +1,14 @@
+{
+  "scripts": {
+    "dev": "wrangler dev src/index.ts",
+    "deploy": "wrangler deploy --minify src/index.ts",
+    "build": "esbuild src/index.ts --bundle --loader:.gif=dataurl --loader:.png=dataurl --outdir=dist"
+  },
+  "dependencies": {
+    "hono": "^3.9.2"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20231025.0",
+    "wrangler": "^3.15.0"
+  }
+}
