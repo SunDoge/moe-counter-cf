@@ -64,7 +64,16 @@ import ru_7 from './rule34/7.gif';
 import ru_8 from './rule34/8.gif';
 import ru_9 from './rule34/9.gif';
 
-export default {
+
+interface Themes {
+  [key: string]: {
+    width: number,
+    height: number,
+    images: any[]
+  }
+}
+
+const THEMES: Themes = {
   asoul: {
     width: 45,
     height: 100,
@@ -96,3 +105,6 @@ export default {
     images: [ru_0, ru_1, ru_2, ru_3, ru_4, ru_5, ru_6, ru_7, ru_8, ru_9],
   },
 };
+
+
+export default THEMES

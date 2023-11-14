@@ -2,7 +2,7 @@
   "scripts": {
     "dev": "wrangler dev src/index.ts",
     "deploy": "wrangler deploy --minify src/index.ts",
-    "build": "esbuild src/index.ts --bundle --loader:.gif=dataurl --loader:.png=dataurl --outdir=dist"
+    "build": "esbuild src/index.ts --bundle --loader:.gif=dataurl --loader:.png=dataurl --platform=neutral --outfile=index.js"
   },
   "dependencies": {
     "hono": "^3.9.2"
