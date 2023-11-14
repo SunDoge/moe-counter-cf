@@ -15,11 +15,11 @@ export async function getNum(db: D1Database, name: string) {
 }
 
 
-export async function setNum(db: D1Database, name: string, num: number) {
+export async function addNum(db: D1Database, name: string) {
     const stmt = db.prepare(`INSERT INTO counters(name, num) 
-    VALUES(?1, ?2) 
+    VALUES(?1, 1) 
     ON CONFLICT(name) DO 
-    UPDATE SET num = ?2`);
-    const info = await stmt.bind(name, num).run();
+    UPDATE SET num = num + 1`);
+    const info = await stmt.bind(name).run();
     return info.success;
 }

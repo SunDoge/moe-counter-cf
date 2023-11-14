@@ -1,7 +1,7 @@
 import { Hono } from 'hono'
 import { cors } from "hono/cors"
 import theme from './theme'
-import { getNum, setNum } from "./sqlite";
+import { getNum, addNum } from "./sqlite";
 
 type Bindings = {
     DB: D1Database;
@@ -20,7 +20,7 @@ app.get('/api/:name', async (c) => {
     const counter = await getNum(c.env.DB, name);
 
     if (add !== '0') {
-        c.executionCtx.waitUntil(setNum(c.env.DB, name, counter.num + 1))
+        c.executionCtx.waitUntil(addNum(c.env.DB, name))
     }
 
     // await setNum(c.env.DB, name, 10)
