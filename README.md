@@ -1,6 +1,6 @@
 # Moe Counter CF
 
-[![Moe](http://count.ahwa.cc/SunDoge:moe-counter-cf)](https://github.com/SunDoge/moe-counter-cf)
+[![Moe](https://count.ahwa.cc/SunDoge:moe-counter-cf?theme=rule34)](https://github.com/SunDoge/moe-counter-cf)
 
 
 ```
