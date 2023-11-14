@@ -1,7 +1,7 @@
 import { Hono } from 'hono'
 import { cors } from "hono/cors"
+import { cache } from "hono/cache"
 import { generateImage } from "./image"
-
 import { getNum, addNum } from "./sqlite";
 
 type Bindings = {
@@ -11,6 +11,10 @@ type Bindings = {
 const app = new Hono<{ Bindings: Bindings }>()
 
 app.use('/*', cors())
+app.get('/*', cache({
+    cacheName: "moe-counter",
+    cacheControl: "max-age=3600" // 1 hour
+}))
 app.get('/', (c) => c.text('Hello Hono!'))
 app.get('/:name', async (c) => {
     const name = c.req.param('name');
