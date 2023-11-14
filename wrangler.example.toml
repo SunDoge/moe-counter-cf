@@ -1,0 +1,12 @@
+name = "moe-counter-cf"
+compatibility_date = "2023-01-01"
+
+main = "dist/index.js"
+
+[build]
+command = "pnpm run build"
+
+[[d1_databases]]
+binding = "DB"                   # i.e. available in your Worker on env.DB
+database_name = "your-database"
+database_id = "your-database-id"

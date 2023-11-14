@@ -1,6 +1,5 @@
 import { Hono } from 'hono'
 import { cors } from "hono/cors"
-import { cache } from "hono/cache"
 import { generateImage } from "./image"
 import { getNum, addNum } from "./sqlite";
 
@@ -11,10 +10,6 @@ type Bindings = {
 const app = new Hono<{ Bindings: Bindings }>()
 
 app.use('/*', cors())
-app.get('/*', cache({
-    cacheName: "moe-counter",
-    cacheControl: "max-age=3600" // 1 hour
-}))
 app.get('/', (c) => c.text('Hello Hono!'))
 app.get('/:name', async (c) => {
     const name = c.req.param('name');
@@ -33,8 +28,14 @@ app.get('/:name', async (c) => {
     } else {
         image = generateImage(counter.num, theme, length, pixelated);
     }
+
+    const nowAsUtcString = (new Date()).toUTCString();
     return c.body(image, 200, {
         'Content-Type': 'image/svg+xml; charset=utf-8',
+        'Cache-Control': 'no-cache',
+        'ETag': counter.num.toString(),
+        'Expires': nowAsUtcString,
+        'Last-Modified': nowAsUtcString,
     })
 });
 
