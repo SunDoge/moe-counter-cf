@@ -2,9 +2,11 @@ import { Hono } from 'hono'
 import { cors } from "hono/cors"
 import { generateImage } from "./image"
 import { getNum, addNum } from "./sqlite";
+import { version } from "../package.json";
 
 type Bindings = {
     DB: D1Database;
+    KV: KVNamespace;
 }
 
 const app = new Hono<{ Bindings: Bindings }>()
@@ -19,23 +21,35 @@ app.get('/:name', async (c) => {
     const pixelated = c.req.query('pixelated') === 'pixelated'
 
     const db = c.env.DB;
+    const kv = c.env.KV;
     const counter = await getNum(db, name);
-
-    let image;
+    const num = counter.num + Number(add);
     if (add) {
-        image = generateImage(counter.num + 1, theme, length, pixelated);
         c.executionCtx.waitUntil(addNum(db, name));
-    } else {
-        image = generateImage(counter.num, theme, length, pixelated);
     }
 
-    const nowAsUtcString = (new Date()).toUTCString();
+    const key = `v${version}/${theme}/${length}/${pixelated}/${num}`;
+    let image;
+    try {
+        image = await kv.get(key, {
+            cacheTtl: 3600,
+        });
+        if (image === null) {
+            image = generateImage(num, theme, length, pixelated);
+            c.executionCtx.waitUntil(kv.put(key, image))
+        }
+    } catch (e) {
+        console.log(e);
+        image = generateImage(num, theme, length, pixelated);
+    }
+
+    const now = new Date();
     return c.body(image, 200, {
         'Content-Type': 'image/svg+xml; charset=utf-8',
         'Cache-Control': 'no-cache',
-        'ETag': counter.num.toString(),
-        'Expires': nowAsUtcString,
-        'Last-Modified': nowAsUtcString,
+        'ETag': key,
+        'Expires': 'Thu, 01 Jan 1970 00:00:00 GMT', // ChatGPT says.
+        'Last-Modified': now.toUTCString(),
     })
 });
 
