@@ -1,0 +1,7 @@
+overrides:
+  "miniflare>sharp": ^0.35.4
+  "miniflare>undici": ^7.29.0
+
+allowBuilds:
+  esbuild: true
+  workerd: true
