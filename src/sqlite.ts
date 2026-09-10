@@ -1,26 +1,41 @@
+import { D1Dialect } from '@sundoge/kysely-d1'
+import { Kysely, sql, type Generated } from 'kysely'
 
-type Counter = {
-    name: string,
-    num: number,
+interface CounterTable {
+    id: Generated<number>
+    name: string
+    num: Generated<number>
+    created_at: Generated<string>
+    updated_at: Generated<string>
+    deleted_at: Generated<string | null>
 }
 
-export async function getNum(db: D1Database, name: string) {
-    const stmt = db.prepare("SELECT name, num from counters WHERE name = ? AND deleted_at IS NULL");
-    const { results } = await stmt.bind(name).all();
-    console.log(results)
-    if (results.length > 0) {
-        return results[0] as Counter;
-    } else {
-        return { name, num: 0 };
-    }
+export function createDatabase(database: D1Database) {
+    return new Kysely<{ counters: CounterTable }>({
+        dialect: new D1Dialect({ database }),
+    })
 }
 
+type Database = ReturnType<typeof createDatabase>
 
-export async function addNum(db: D1Database, name: string) {
-    const stmt = db.prepare(`INSERT INTO counters(name, num) 
-    VALUES(?1, 1) 
-    ON CONFLICT(name) DO 
-    UPDATE SET num = num + 1, updated_at = CURRENT_TIMESTAMP`);
-    const info = await stmt.bind(name).run();
-    return info.success;
+export async function getNum(db: Database, name: string) {
+    return await db.selectFrom('counters')
+        .select(['name', 'num'])
+        .where('name', '=', name)
+        .where('deleted_at', 'is', null)
+        .executeTakeFirst() ?? { name, num: 0 }
+}
+
+export async function addNum(db: Database, name: string) {
+    // Return the committed value in the same statement, including concurrent requests.
+    return db.insertInto('counters')
+        .values({ name, num: 1 })
+        .onConflict((oc) => oc.column('name').doUpdateSet((eb) => ({
+            num: eb.case().when('counters.deleted_at', 'is', null)
+                .then(eb('counters.num', '+', 1)).else(1).end(),
+            updated_at: sql<string>`CURRENT_TIMESTAMP`,
+            deleted_at: null,
+        })))
+        .returning(['name', 'num'])
+        .executeTakeFirstOrThrow()
 }

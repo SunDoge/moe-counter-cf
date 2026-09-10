@@ -1,18 +1,19 @@
 {
   "compilerOptions": {
-    "target": "ESNext",
+    "target": "ES2022",
     "module": "ESNext",
-    "moduleResolution": "node",
-    "esModuleInterop": true,
+    "moduleResolution": "Bundler",
     "strict": true,
+    "noEmit": true,
     "lib": [
-      "esnext"
+      "ES2022"
     ],
     "types": [
-      "@cloudflare/workers-types",
+      "@cloudflare/workers-types"
     ],
-    "jsx": "react-jsx",
-    "jsxImportSource": "hono/jsx",
-    "resolveJsonModule": true,
+    "resolveJsonModule": true
   },
+  "include": [
+    "src/**/*.ts"
+  ]
 }
