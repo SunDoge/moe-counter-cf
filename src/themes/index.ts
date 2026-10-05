@@ -69,7 +69,7 @@ interface Themes {
   [key: string]: {
     width: number,
     height: number,
-    images: any[]
+    images: string[]
   }
 }
 

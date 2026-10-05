@@ -1,16 +1,32 @@
 {
-  "version": "0.1.0",
+  "version": "0.2.0",
   "scripts": {
     "dev": "wrangler dev",
     "deploy": "wrangler deploy --minify",
-    "build": "esbuild src/index.ts --bundle --loader:.gif=dataurl --loader:.png=dataurl --platform=neutral --outfile=dist/index.js"
+    "build": "esbuild src/index.ts --bundle --format=esm --loader:.gif=dataurl --loader:.png=dataurl --platform=neutral --outfile=dist/index.js",
+    "typecheck": "tsc --noEmit",
+    "test": "pnpm run build && node --test test/*.test.mjs",
+    "check": "pnpm run typecheck && pnpm test",
+    "db:init:local": "wrangler d1 execute DB --local --file=schema.sql",
+    "db:init:remote": "wrangler d1 execute DB --remote --file=schema.sql"
   },
   "dependencies": {
-    "hono": "^3.9.2"
+    "hono": "^4.13.7",
+    "@sundoge/kysely-d1": "^0.3.0",
+    "kysely": "^0.29.5"
   },
   "devDependencies": {
-    "@cloudflare/workers-types": "^4.20231025.0",
-    "esbuild": "^0.19.5",
-    "wrangler": "^3.15.0"
-  }
+    "@cloudflare/workers-types": "^4.20260702.1",
+    "esbuild": "^0.28.2",
+    "typescript": "^7.0.2",
+    "wrangler": "4.107.0",
+    "miniflare": "4.20260701.0"
+  },
+  "name": "moe-counter-cf",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=22.0.0"
+  },
+  "packageManager": "pnpm@12.3.4"
 }
